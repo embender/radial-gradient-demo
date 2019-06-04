@@ -1,1 +1,1 @@
-Simple app demonstrating a RadialGradientBrush from Windows.UI.Composition. Need min. OS version 18362
+Simple app demonstrating a RadialGradientBrush from Windows.UI.Composition. Must be targeting Windows 10 version 1903
