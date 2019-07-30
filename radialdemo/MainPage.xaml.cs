@@ -27,7 +27,7 @@ namespace radialdemo
         {
             this.InitializeComponent();
         }
-        
+
         private Compositor _compositor;
 
         // create the two visuals that make up this visual effect
@@ -42,7 +42,7 @@ namespace radialdemo
         private CompositionColorGradientStop _MBGradientStop1;
         private CompositionColorGradientStop _MBGradientStop2;
         private CompositionColorGradientStop _MBGradientStop3;
-        
+
         private CompositionColorGradientStop _PBGradientStop1;
         private CompositionColorGradientStop _PBGradientStop2;
 
@@ -54,7 +54,7 @@ namespace radialdemo
         private Color _coolColor1 = Colors.Teal;
         private Color _coolColor2 = Colors.BlueViolet;
         private Color _coolColor3 = Colors.Plum;
-        
+
         private Color _innerPulseColor = Colors.Transparent;
         private Color _outerPulseColor = Colors.AliceBlue;
 
@@ -72,7 +72,7 @@ namespace radialdemo
 
         private CompositionPropertySet _hoverPositionPropertySet;
 
-        Boolean _isAnimationOn = false;
+        bool _isAnimationOn = false;
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -81,7 +81,7 @@ namespace radialdemo
 
             // create what captures the pointer position
             _hoverPositionPropertySet = ElementCompositionPreview.GetPointerPositionPropertySet(r2);
-            
+
             // create the two visuals
             _vis = _compositor.CreateSpriteVisual();
             _pulseVis = _compositor.CreateSpriteVisual();
@@ -90,7 +90,7 @@ namespace radialdemo
             _mainBrush = _compositor.CreateRadialGradientBrush();
             _mainBrush.EllipseCenter = new Vector2(.5f, .5f);
             _mainBrush.EllipseRadius = new Vector2(.5f, .5f);
-           
+
             _MBGradientStop1 = _compositor.CreateColorGradientStop();
             _MBGradientStop1.Offset = 0;
             _MBGradientStop1.Color = _warmColor1;
@@ -106,7 +106,7 @@ namespace radialdemo
             _mainBrush.ColorStops.Add(_MBGradientStop1);
             _mainBrush.ColorStops.Add(_MBGradientStop2);
             _mainBrush.ColorStops.Add(_MBGradientStop3);
-            
+
             // create the brush for the pulse visual
             _pulseBrush = _compositor.CreateRadialGradientBrush();
             _pulseBrush.EllipseCenter = new Vector2(.5f, .5f);
@@ -160,7 +160,7 @@ namespace radialdemo
             ElementCompositionPreview.SetElementChildVisual(r1, _pulseVis);
 
             // ellipse center follows mouse
-            _ellipseCenterAnim = _compositor.CreateExpressionAnimation("Vector2(p.Position.X / 500.0f, p.Position.Y / 500.0f)");  
+            _ellipseCenterAnim = _compositor.CreateExpressionAnimation("Vector2(p.Position.X / 500.0f, p.Position.Y / 500.0f)");
             _ellipseCenterAnim.SetReferenceParameter("p", _hoverPositionPropertySet);
             _mainBrush.StartAnimation("EllipseCenter", _ellipseCenterAnim);
 
@@ -208,71 +208,37 @@ namespace radialdemo
             _pulseScaleAnim.InsertKeyFrame(1, Vector3.One);
             _pulseScaleAnim.Duration = TimeSpan.FromSeconds(1);
             _pulseScaleAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-            
+
             _pulseVis.StartAnimation("Scale", _pulseScaleAnim);
         }
 
         // when the first visual is clicked, it switches the brush on the visual from warm to cool colors and animates those color stops 
         private void OnClick(object sender, RoutedEventArgs e)
         {
-            if (_isAnimationOn == false)
-            {
-                // animate the first stop of the first visual
-                _stop1Anim = _compositor.CreateColorKeyFrameAnimation();
-                _stop1Anim.InsertKeyFrame(0, _warmColor1);
-                _stop1Anim.InsertKeyFrame(.5f, _warmColor3);
-                _stop1Anim.InsertKeyFrame(1, _warmColor1);
-                _stop1Anim.Duration = TimeSpan.FromSeconds(4);
-                _stop1Anim.IterationBehavior = AnimationIterationBehavior.Forever;
+            var color1 = _isAnimationOn ? _coolColor1 : _warmColor1;
+            var color2 = _isAnimationOn ? _coolColor2 : _warmColor2;
+            var color3 = _isAnimationOn ? _coolColor3 : _warmColor3;
 
-                _MBGradientStop1.StartAnimation("Color", _stop1Anim);
+            // animate the first stop of the first visual
+            _stop1Anim = _compositor.CreateColorKeyFrameAnimation();
+            _stop1Anim.InsertKeyFrame(0, color1);
+            _stop1Anim.InsertKeyFrame(.5f, color3);
+            _stop1Anim.InsertKeyFrame(1, color1);
+            _stop1Anim.Duration = TimeSpan.FromSeconds(4);
+            _stop1Anim.IterationBehavior = AnimationIterationBehavior.Forever;
 
-                // animate the second stop of the first visual
-                _stop2Anim = _compositor.CreateColorKeyFrameAnimation();
-                _stop2Anim.InsertKeyFrame(0, _warmColor3);
-                _stop2Anim.InsertKeyFrame(1, _warmColor2);
-                _stop2Anim.Duration = TimeSpan.FromSeconds(2);
-                _stop2Anim.IterationBehavior = AnimationIterationBehavior.Forever;
+            _MBGradientStop1.StartAnimation("Color", _stop1Anim);
 
-                _MBGradientStop2.StartAnimation("Color", _stop2Anim);
+            // animate the second stop of the first visual
+            _stop2Anim = _compositor.CreateColorKeyFrameAnimation();
+            _stop2Anim.InsertKeyFrame(0, color3);
+            _stop2Anim.InsertKeyFrame(1, color2);
+            _stop2Anim.Duration = TimeSpan.FromSeconds(2);
+            _stop2Anim.IterationBehavior = AnimationIterationBehavior.Forever;
 
-                _isAnimationOn = true;
-            }
-            else
-            {
-                // animate the first stop of the first visual
-                _stop1Anim = _compositor.CreateColorKeyFrameAnimation();
-                _stop1Anim.InsertKeyFrame(0, _coolColor1);
-                _stop1Anim.InsertKeyFrame(.5f, _coolColor3);
-                _stop1Anim.InsertKeyFrame(1, _coolColor1);
-                _stop1Anim.Duration = TimeSpan.FromSeconds(4);
-                _stop1Anim.IterationBehavior = AnimationIterationBehavior.Forever;
+            _MBGradientStop2.StartAnimation("Color", _stop2Anim);
 
-                _MBGradientStop1.StartAnimation("Color", _stop1Anim);
-
-                // animate the second stop of the first visual
-                _stop2Anim.InsertKeyFrame(0, _coolColor3);
-                _stop2Anim.InsertKeyFrame(1, _coolColor2);
-                _stop2Anim.Duration = TimeSpan.FromSeconds(2);
-                _stop2Anim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                _MBGradientStop2.StartAnimation("Color", _stop2Anim);
-
-                _isAnimationOn = false;
-            }
+            _isAnimationOn = !_isAnimationOn;
         }
-
-        private Vector3 r1_PointerMoved(object sender, PointerRoutedEventArgs e)
-        {          
-            var x = e.GetCurrentPoint(r2).Position.X;
-            var y = e.GetCurrentPoint(r2).Position.Y;
-
-            my_pointer = new Vector3((float)x, (float)y, 0);
-
-            _mainBrush.EllipseCenter = new Vector2(my_pointer.X, my_pointer.Y);
-            
-            return my_pointer;
-        }
-        
     }
 }
